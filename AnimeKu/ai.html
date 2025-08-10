@@ -1,0 +1,1056 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AnimeKu — Futuristik Player (Full)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg1:#050611; --bg2:#071227;
+  --panel: rgba(255,255,255,0.03);
+  --cyan:#00f0ff; --pink:#ff4db0;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+  background: linear-gradient(180deg,var(--bg1),var(--bg2));
+  color:#eaf9ff;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* Header */
+header{
+  position:sticky; top:0; z-index:80;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; padding:12px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  backdrop-filter: blur(6px);
+  border-bottom:1px solid rgba(255,255,255,0.02);
+}
+.brand{display:flex; align-items:center; gap:10px}
+.logo { width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#081224,#0c2540);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--cyan)}
+.header-text{line-height:1}
+.header-text .title{font-size:15px;color:var(--cyan);text-shadow:0 0 8px rgba(0,240,255,0.06)}
+.header-text .sub{font-size:11px;color:#9fbfd0}
+.profile img{width:44px;height:44px;border-radius:50%;border:2px solid rgba(0,240,255,0.12)}
+
+/* Container */
+.wrap{padding:12px;max-width:1100px;margin:0 auto}
+
+/* Slider (height follows image) */
+.slider{ width:100%; overflow:hidden; border-radius:12px; margin-bottom:12px; position:relative; box-shadow:0 10px 30px rgba(0,0,0,0.6) }
+.slider-track{ display:flex; transition:transform .55s cubic-bezier(.2,.9,.2,1); will-change:transform }
+.slide{ min-width:100% }
+.slide img{ display:block; width:100%; height:auto; border-radius:12px }
+
+/* slider nav */
+.slider-nav{ position:absolute; inset:0; display:flex; align-items:center; justify-content:space-between; pointer-events:none }
+.slider-nav button{ pointer-events:auto; background:rgba(0,0,0,0.45); color:#fff; border:0; padding:8px 10px; margin:8px; border-radius:8px; cursor:pointer }
+
+/* controls: genres + search */
+.controls { display:flex; flex-direction:column; gap:10px; margin-top:8px }
+.genre-chips{ display:flex; gap:8px; overflow-x:auto; padding-bottom:4px }
+.genre-chips::-webkit-scrollbar{height:8px}
+.genre-chips button{
+  background:transparent;border:1px solid rgba(255,255,255,0.05);color:#cfefff;padding:8px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;transition:all .16s;
+}
+.genre-chips button.active{ background:var(--cyan); color:#001218; border-color:var(--cyan); box-shadow:0 10px 30px rgba(0,240,255,0.06) }
+
+.search-row { 
+  position: relative;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.search-row input {
+  flex: 1;
+  padding: 12px 16px 12px 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.2);
+  color: #eaf9ff;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.search-row input::placeholder {
+  color: rgba(234,249,255,0.6);
+}
+
+.search-row input:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 2px rgba(0,240,255,0.1);
+}
+
+.search-row::before {
+  position: absolute;
+  left: 16px;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.search-row { 
+  position: relative;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.search-row input {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.2);
+  color: #eaf9ff;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.search-row input::placeholder {
+  color: rgba(234,249,255,0.6);
+}
+
+.search-row input:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 2px rgba(0,240,255,0.1);
+}
+
+
+.search-row::before {
+  position: absolute;
+  left: 16px;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.search-row button { 
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: 0;
+  background: linear-gradient(90deg, var(--cyan), var(--pink));
+  color: #0b0b0b;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.2s ease;
+  box-shadow: 0 8px 24px rgba(255,77,191,0.15);
+}
+
+.search-row button:hover {
+  transform: translateY(-1px);
+}
+
+/* sections */
+.section-title{ display:flex; align-items:center; gap:10px; margin:12px 0 6px }
+.section-title h2{ margin:0; color:var(--pink); font-size:15px }
+.section-title small{ color:#9fbfd0 }
+
+/* horizontal list */
+.list-horizontal{ display:flex; gap:10px; overflow-x:auto; padding-bottom:8px }
+.list-horizontal::-webkit-scrollbar{height:8px}
+.list-horizontal::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.05);border-radius:8px}
+
+/* card */
+.card{
+  flex:0 0 140px; min-width:140px; background:var(--panel); border-radius:10px; overflow:hidden; border:1px solid rgba(255,255,255,0.03);
+  transition:transform .14s, box-shadow .14s; position:relative; cursor:pointer;
+}
+.card:hover{ transform:translateY(-6px); box-shadow:0 18px 40px rgba(0,0,0,0.6) }
+.card img{ width:100%; height:200px; object-fit:cover; display:block }
+.meta{ padding:8px; font-size:13px; text-align:center }
+.title{ font-weight:600; margin:0; color:#eaf9ff; font-size:13px }
+.sub{ font-size:12px; color:#9fbfd0; margin-top:4px }
+
+/* badges on card */
+.genre-badge {
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-block;
+  margin-top: 2px;
+  color: var(--cyan);
+  background: none;
+  box-shadow: none;
+  position: static;
+  padding: 0;
+}
+
+.g-action{ background:#ff4d4d; color:#120000 }
+.g-comedy{ background:#ffd24d; color:#221200 }
+.g-romance{ background:#ff6fbf; color:#24000c }
+.g-fantasy{ background:#7ad3ff; color:#021428 }
+.g-horror{ background:#9b6bff; color:#0f0014 }
+.g-slice{ background:#9dffb8; color:#06210b }
+
+/* recommendation vertical */
+.recommend-wrap{ max-height:420px; overflow-y:auto; padding-right:6px }
+.recommend-card{ display:flex; gap:10px; align-items:flex-start; padding:10px; margin-bottom:10px; background:var(--panel); border-radius:10px; border:1px solid rgba(255,255,255,0.02); cursor:pointer }
+.recommend-card img{ width:110px; height:140px; object-fit:cover; border-radius:8px }
+.recommend-card .info h3{ margin:0; font-size:15px } .recommend-card .info p{ margin:6px 0 0; font-size:13px; color:#9fbfd0 }
+
+/* player */
+#playerArea{ display:none; margin-top:14px }
+.player{ padding:10px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; border:1px solid rgba(255,255,255,0.02) }
+.player video{ width:100%; border-radius:8px; background:#000 }
+.episode-buttons{ display:flex; gap:8px; margin-top:10px; flex-wrap:wrap }
+.episode-buttons button{ background:transparent; border:1px solid rgba(255,255,255,0.06); color:#cfefff; padding:8px 10px; border-radius:8px; cursor:pointer }
+.episode-buttons button.active{ background:var(--pink); color:#150012; border-color:var(--pink); box-shadow:0 8px 30px rgba(255,77,191,0.08) }
+
+/* responsive */
+@media (max-width:520px){
+  .card{ flex:0 0 46%; min-width:46% }
+  .card img{ height:170px }
+  .recommend-card img{ width:100px; height:120px }
+  .search-row{ flex-direction:column; gap:8px }
+  .search-row button{ width:100% }
+}
+.genre-badge,
+.genre-badge.g-action,
+.genre-badge.g-comedy,
+.genre-badge.g-romance,
+.genre-badge.g-fantasy,
+.genre-badge.g-horror,
+.genre-badge.g-slice {
+  background: none !important;
+  color: var(--cyan) !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+  font-weight: 600 !important;
+  font-size: 11px !important;
+  position: static !important;
+}
+
+#closePlayerBtn:hover {
+  color: #ff8080;
+  transform: scale(1.2);
+  transition: 0.2s;
+}
+
+/* Loading Screen */
+#loadingScreen {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(180deg, var(--bg1), var(--bg2));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  color: var(--cyan);
+  font-size: 18px;
+}
+
+.loader {
+  border: 4px solid rgba(255,255,255,0.1);
+  border-left-color: var(--cyan);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 12px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Profile Modal */
+#profileModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.profile-box {
+  background: var(--panel);
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  color: #eaf9ff;
+  width: 250px;
+}
+
+.profile-box input {
+  width: 100%;
+  margin: 8px 0;
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+}
+
+.profile-box button {
+  margin-top: 8px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+#saveProfileBtn {
+  background: var(--cyan);
+  color: #000;
+}
+
+#closeProfileModal {
+  background: #999;
+  color: #000;
+}
+
+/* Modal Profil */
+#profileModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.profile-box {
+  background: var(--panel);
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  color: #eaf9ff;
+  width: 250px;
+}
+
+.profile-box input {
+  width: 100%;
+  margin: 8px 0;
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+}
+
+.profile-box button {
+  margin-top: 8px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+#saveProfileBtn {
+  background: var(--cyan);
+  color: #000;
+}
+
+#closeProfileModal {
+  background: #999;
+  color: #000;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-info #profileName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cyan);
+}
+
+/* Background modal */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Box modal */
+.modal-content {
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 14px;
+  padding: 20px;
+  width: 300px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+  animation: fadeInUp 0.3s ease;
+}
+
+/* Judul */
+.modal-content h2 {
+  margin-top: 0;
+  color: var(--cyan);
+  text-align: center;
+  font-size: 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding-bottom: 10px;
+}
+
+/* Input */
+.modal-content input[type="text"],
+.modal-content input[type="file"] {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.05);
+  background: rgba(0,0,0,0.3);
+  color: #fff;
+  font-size: 14px;
+}
+
+/* Tombol */
+.modal-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.modal-buttons button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+#saveProfileBtn {
+  background: linear-gradient(90deg, var(--cyan), var(--pink));
+  color: #000;
+}
+
+#closeProfileModal {
+  background: rgba(255,255,255,0.05);
+  color: #fff;
+}
+
+#saveProfileBtn:hover {
+  opacity: 0.85;
+}
+
+#closeProfileModal:hover {
+  background: rgba(255,255,255,0.12);
+}
+
+/* Animasi */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Bungkus custom file input */
+.file-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Sembunyikan input file asli */
+.file-input-wrapper input[type="file"] {
+  display: none;
+}
+
+/* Tombol custom */
+.file-input-wrapper label {
+  display: inline-block;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--cyan), var(--pink));
+  color: #000;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(255, 77, 191, 0.15);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.file-input-wrapper label:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+/* Nama file */
+#fileName {
+  font-size: 12px;
+  color: #cfefff;
+  font-style: italic;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+
+</style>
+</head>
+<body>
+
+     <div id="profileModal" class="modal">
+  <div class="modal-content">
+    <h2>Edit Profile</h2>
+    <label>Nama Akun</label>
+    <input type="text" id="profileNameInput" placeholder="Masukkan nama...">
+    
+    <label>Foto Profil</label>
+    <div class="file-input-wrapper">
+  <input type="file" id="profileImageInput" accept="image/*">
+  <label for="profileImageInput">📂 Pilih Foto</label>
+  <span id="fileName">Tidak ada file</span>
+</div>
+
+
+    <div class="modal-buttons">
+      <button id="saveProfileBtn">Simpan</button>
+      <button id="closeProfileModal">Batal</button>
+    </div>
+  </div>
+</div>
+
+
+    <!-- Loading Screen -->
+<div id="loadingScreen">
+  <div class="loader"></div>
+  <p>Loading...</p>
+</div>
+
+<header>
+  <div class="brand">
+    <div class="logo">AX</div>
+    <div class="header-text">
+      <div class="title">AnimeKu</div>
+      <div class="sub">Futuristic Player</div>
+    </div>
+  </div>
+  <div class="user-info">
+    <span id="profileName">Nama Pengguna</span>
+    <div class="profile" id="editProfileBtn">
+      <img id="profileImage" src="default.jpg" alt="Profile">
+    </div>
+  </div>
+</header>
+
+
+
+<!-- Modal Edit Profil -->
+<div id="profileModal" style="display:none;">
+  <div class="profile-box">
+    <h3>Edit Profil</h3>
+    <input type="text" id="profileNameInput" placeholder="Masukkan nama...">
+    <input type="file" id="profileImageInput" accept="image/*">
+    <button id="saveProfileBtn">Simpan</button>
+    <button id="closeProfileModal">Batal</button>
+  </div>
+</div>
+
+
+<!-- Profile Edit Modal -->
+<div id="profileModal" style="display:none;">
+  <div class="profile-box">
+    <h3>Edit Profil</h3>
+    <input type="text" id="profileNameInput" placeholder="Masukkan nama..." />
+    <input type="file" id="profileImageInput" accept="image/*" />
+    <button id="saveProfileBtn">Simpan</button>
+    <button id="closeProfileModal">Batal</button>
+  </div>
+</div>
+
+
+<div class="wrap">
+  <!-- Slider -->
+  <div class="slider" id="slider">
+    <div class="slider-track" id="sliderTrack"></div>
+    <div class="slider-nav">
+      <button id="prevBtn" aria-label="prev">‹</button>
+      <button id="nextBtn" aria-label="next">›</button>
+    </div>
+  </div>
+
+  <!-- Genres -->
+  <div class="controls">
+    <div style="margin-top:6px" class="genre-chips" id="genreChips"></div>
+
+    <!-- Search row (under genre chips) -->
+    <div class="search-row">
+      <input id="searchInput" placeholder="Temukan anime favoritmu..." />
+      <button id="searchBtn">Cari</button>
+    </div>
+  </div>
+
+  <!-- Populer -->
+  <div class="section-title"><h2>🔥 Populer Hari Ini</h2><small>— yang banyak ditonton</small></div>
+  <div class="list-horizontal" id="populerList"></div>
+
+  <!-- Rekomendasi -->
+  <div class="section-title"><h2>✨ Rekomendasi Anime</h2><small>— pilihan editor</small></div>
+  <div class="recommend-wrap" id="recommendWrap"></div>
+
+  <!-- Riwayat Tontonan -->
+  <div class="section-title"><h2>📜 Riwayat Tontonan</h2><small>— anime yang sudah kamu tonton</small></div>
+  <div class="recommend-wrap" id="historyWrap"></div>
+
+
+  <!-- Player Area -->
+<div id="playerArea">
+  <div class="section-title">
+    <h2>▶️ Pemutar</h2>
+    <small id="playerSubtitle"></small>
+    <button id="closePlayerBtn" style="
+      margin-left:auto;
+      background:transparent;
+      border:none;
+      color:#ff4d4d;
+      font-size:18px;
+      cursor:pointer;
+    " title="Tutup Pemutar">✖</button>
+  </div>
+  <div class="player" id="playerBox">
+    <video id="videoPlayer" controls playsinline preload="metadata" poster=""></video>
+    <div class="episode-buttons" id="episodeButtons"></div>
+  </div>
+</div>
+
+
+<script>
+    
+    let currentAnimeId = null;
+
+/* -------------------------
+   Data (banyak contoh anime + episode)
+   ------------------------- */
+const ANIME_DB = [
+  {id:'Mikadono', title:'Mikadono san Shimai wa Angai Choroi', img:'thumbnile/Mikadono.jpg', genre: 'shounen romance comedy', episodes:[
+    {id:'s1',title:'Ep 1',src:'video mikadono/Mikadono_Sanshimai_wa_Angai__Choroi. Episode 1 720p.mp4'},
+    {id:'s1',title:'Ep 2',src:'video mikadono/Mikadono_Sanshimai_wa_Angai__Choroi. Episode 2 720p.mp4'},
+    {id:'s1',title:'Ep 3',src:'video mikadono/Mikadono_Sanshimai_wa_Angai__Choroi. Episode 3 720p.mp4'},
+    {id:'s1',title:'Ep 4',src:'video mikadono/Mikadono_Sanshimai_wa_Angai__Choroi. Episode 4 720p.mp4'},
+    {id:'s1',title:'Ep 5',src:'video mikadono/Mikadono_Sanshimai_wa_Angai__Choroi. Episode 5 720p.mp4'},
+    {id:'s1',title:'Ep 6',src:'video mikadono/Mikadono_Sanshimai_wa_Angai__Choroi. Episode 6 720p.mp4'}
+  ]},
+  {id:'Sono', title:'Sono Bisque Doll wa koi wo Suru', img:'thumbnile/Sono Bisque Doll wa Koi wo Suru.jpg', genre:'seinen slice of life romance school', episodes:[
+    {id:'s1',title:'Ep 1',src:'https://www.w3schools.com/html/mov_bbb.mp4'},
+    {id:'s1',title:'Ep 2',src:'https://www.w3schools.com/html/movie.mp4'},
+    {id:'s1',title:'Ep 3',src:'https://www.w3schools.com/html/movie.mp4'},
+    {id:'s1',title:'Ep 4',src:'https://www.w3schools.com/html/movie.mp4'},
+    {id:'s1',title:'Ep 5',src:'https://www.w3schools.com/html/movie.mp4'},
+    {id:'s1',title:'Ep 6',src:'https://www.w3schools.com/html/movie.mp4'},
+    {id:'s1',title:'Ep 7',src:'https://www.w3schools.com/html/movie.mp4'},
+    {id:'s1',title:'Ep 8',src:'https://www.w3schools.com/html/movie.mp4'},
+    {id:'s1',title:'Ep 9',src:'https://www.w3schools.com/html/movie.mp4'},
+    {id:'s1',title:'Ep 10',src:'https://www.w3schools.com/html/movie.mp4'},
+    {id:'s1',title:'Ep 11',src:'https://www.w3schools.com/html/movie.mp4'},
+    {id:'s1',title:'Ep 12',src:'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4'}
+  ]},
+  {id:'bleach', title:'Bleach', img:'https://picsum.photos/id/1011/600/900', genre:'action', episodes:[
+    {id:'b1',title:'Ep 1',src:'https://www.w3schools.com/html/movie.mp4'},
+    {id:'b2',title:'Ep 2',src:'https://www.w3schools.com/html/mov_bbb.mp4'}
+  ]},
+  {id:'aot', title:'Attack on Titan', img:'https://picsum.photos/id/1035/600/900', genre:'action', episodes:[
+    {id:'a1',title:'S1 Ep 1',src:'https://www.w3schools.com/html/mov_bbb.mp4'},
+    {id:'a2',title:'S1 Ep 2',src:'https://www.w3schools.com/html/movie.mp4'}
+  ]},
+  {id:'dbz', title:'Dragon Ball Z', img:'https://picsum.photos/id/1062/600/900', genre:'fantasy', episodes:[
+    {id:'d1',title:'Ep 1',src:'https://www.w3schools.com/html/mov_bbb.mp4'},
+    {id:'d2',title:'Ep 2',src:'https://www.w3schools.com/html/movie.mp4'}
+  ]},
+  {id:'chainsaw', title:'Chainsaw Man', img:'https://picsum.photos/id/1037/600/900', genre:'horror', episodes:[
+    {id:'c1',title:'Ep 1',src:'https://www.w3schools.com/html/mov_bbb.mp4'},
+    {id:'c2',title:'Ep 2',src:'https://www.w3schools.com/html/movie.mp4'}
+  ]},
+  {id:'jujutsu', title:'Jujutsu Kaisen', img:'https://picsum.photos/id/1042/600/900', genre:'fantasy', episodes:[
+    {id:'j1',title:'Ep 1',src:'https://www.w3schools.com/html/movie.mp4'},
+    {id:'j2',title:'Ep 2',src:'https://www.w3schools.com/html/mov_bbb.mp4'}
+  ]},
+  {id:'demon', title:'Demon Slayer', img:'https://picsum.photos/id/1027/600/900', genre:'fantasy', episodes:[
+    {id:'ds1',title:'Ep 1',src:'https://www.w3schools.com/html/mov_bbb.mp4'},
+    {id:'ds2',title:'Ep 2',src:'https://www.w3schools.com/html/movie.mp4'}
+  ]},
+  {id:'kaoru', title:'Kaoru Hana wa Rin to Saku', img:'thumbnile/download (4).jpg', genre:'drama romance comedy', episodes:[
+    {id:'s1',title:'Ep 1',src:'video kaoru s1/Kaoru_Hana_wa_Rin_to_Saku Episode 1 720p.mp4'},
+    {id:'s1',title:'Ep 2',src:'video kaoru s1/Kaoru_Hana_wa_Rin_to_Saku Episode 2 720p.mp4'},
+    {id:'s1',title:'Ep 3',src:'video kaoru s1/Kaoru_Hana_wa_Rin_to_Saku Episode 3 720p.mp4'},
+    {id:'s1',title:'Ep 4',src:'video kaoru s1/Kaoru_Hana_wa_Rin_to_Saku Episode 4 720p.mp4'},
+    {id:'s1',title:'Ep 5',src:'video kaoru s1/Kaoru_Hana_wa_Rin_to_Saku Episode 5 720p.mp4'},
+    {id:'s1',title:'Ep 6',src:'video kaoru s1/Kaoru_Hana_wa_Rin_to_Saku Episode 6 720p.mp4'}
+  ]},
+  {id:'yourname', title:'Your Name', img:'https://picsum.photos/id/1049/600/900', genre:'romance', episodes:[
+    {id:'y1',title:'Movie',src:'https://www.w3schools.com/html/movie.mp4'}
+  ]},
+  {id:'mha', title:'My Hero Academia', img:'https://picsum.photos/id/1058/600/900', genre:'action', episodes:[
+    {id:'m1',title:'Ep 1',src:'https://www.w3schools.com/html/mov_bbb.mp4'},
+    {id:'m2',title:'Ep 2',src:'https://www.w3schools.com/html/movie.mp4'}
+  ]},
+  {id:'tokyo', title:'Tokyo Revengers', img:'https://picsum.photos/id/1060/600/900', genre:'comedy', episodes:[
+    {id:'t1',title:'Ep 1',src:'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4'},
+    {id:'t2',title:'Ep 2',src:'https://www.w3schools.com/html/mov_bbb.mp4'}
+  ]},
+  {id:'kaguya', title:'Kaguya-sama', img:'https://picsum.photos/id/1068/600/900', genre:'romance', episodes:[
+    {id:'k1',title:'Ep 1',src:'https://www.w3schools.com/html/movie.mp4'},
+    {id:'k2',title:'Ep 2',src:'https://www.w3schools.com/html/mov_bbb.mp4'}
+  ]},
+  {id:'slife', title:'Barakamon', img:'https://picsum.photos/id/1071/600/900', genre:'slice', episodes:[
+    {id:'b1',title:'Ep 1',src:'https://www.w3schools.com/html/mov_bbb.mp4'},
+    {id:'b2',title:'Ep 2',src:'https://www.w3schools.com/html/movie.mp4'}
+  ]},
+  {id:'fate', title:'Fate/Zero', img:'https://picsum.photos/id/1073/600/900', genre:'fantasy', episodes:[
+    {id:'fz1',title:'Ep 1',src:'https://www.w3schools.com/html/movie.mp4'},
+    {id:'fz2',title:'Ep 2',src:'https://www.w3schools.com/html/mov_bbb.mp4'}
+  ]}
+];
+
+/* genre map for labels */
+const GENRE_MAP = {
+  action:{label:'Action', cls:'g-action'},
+  comedy:{label:'Comedy', cls:'g-comedy'},
+  romance:{label:'Romance', cls:'g-romance'},
+  fantasy:{label:'Fantasy', cls:'g-fantasy'},
+  horror:{label:'Horror', cls:'g-horror'},
+  slice:{label:'Slice of Life', cls:'g-slice'}
+};
+
+/* -------------------------
+   Slider setup (images may have different heights)
+   ------------------------- */
+const sliderImgs = [
+  'thumbnile/One puch man.jpg',
+  'thumbnile/Mikadono.jpg',
+  'thumbnile/download (4).jpg',
+  'thumbnile/Dandadan.jpg'
+];
+const sliderTrack = document.getElementById('sliderTrack');
+sliderImgs.forEach(src=>{
+  const slide = document.createElement('div'); slide.className='slide';
+  const img = document.createElement('img'); img.src = src; slide.appendChild(img);
+  sliderTrack.appendChild(slide);
+});
+let slideIndex = 0;
+function slides(){ return document.querySelectorAll('.slide'); }
+function showSlide(i){
+  slideIndex = (i + slides().length) % slides().length;
+  sliderTrack.style.transform = `translateX(-${slideIndex * 100}%)`;
+  const currentImg = slides()[slideIndex].querySelector('img');
+  if (currentImg && currentImg.complete) adjustSliderHeight(currentImg); else if(currentImg) currentImg.onload = ()=> adjustSliderHeight(currentImg);
+}
+function adjustSliderHeight(img){
+  const slider = document.getElementById('slider');
+  const h = img.naturalHeight * (slider.clientWidth / img.naturalWidth);
+  slider.style.height = h + 'px';
+}
+document.getElementById('nextBtn').addEventListener('click', ()=> showSlide(slideIndex+1));
+document.getElementById('prevBtn').addEventListener('click', ()=> showSlide(slideIndex-1));
+let sliderTimer = setInterval(()=> showSlide(slideIndex+1), 3500);
+document.getElementById('slider').addEventListener('mouseenter', ()=> clearInterval(sliderTimer));
+document.getElementById('slider').addEventListener('mouseleave', ()=> sliderTimer = setInterval(()=> showSlide(slideIndex+1), 3500));
+showSlide(0);
+slides().forEach(sl=>{
+  const img = sl.querySelector('img');
+  if(img.complete) adjustSliderHeight(img); else img.onload = ()=> adjustSliderHeight(img);
+});
+
+/* -------------------------
+   Build genre chips
+   ------------------------- */
+const genreChips = document.getElementById('genreChips');
+const genres = ['all', 'action', 'comedy', 'romance', 'fantasy', 'horror', 'slice', 'shounen', 'seinen' ];
+
+genres.forEach(g=>{
+  const btn = document.createElement('button');
+   btn.textContent = (g==='all') 
+    ? 'Semua' 
+    : (GENRE_MAP[g]?.label || g.charAt(0).toUpperCase() + g.slice(1));
+  btn.dataset.genre = g;
+  if(g==='all') btn.classList.add('active');
+btn.addEventListener('click', ()=>{
+  document.querySelectorAll('.genre-chips button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+});
+
+  genreChips.appendChild(btn);
+});
+
+/* -------------------------
+   Render lists (popular & recommendation)
+   ------------------------- */
+const populerList = document.getElementById('populerList');
+const recommendWrap = document.getElementById('recommendWrap');
+
+function createCard(anime){
+  const c = document.createElement('div');
+  c.className = 'card';
+  c.dataset.genre = anime.genre;
+  c.dataset.title = anime.title.toLowerCase();
+  c.dataset.id = anime.id;
+  
+  const badgeClass = (GENRE_MAP[anime.genre]||{}).cls || '';
+  const badgeLabel = (GENRE_MAP[anime.genre]?.label) || anime.genre;
+  
+  c.innerHTML = `
+    <img src="${anime.img}" alt="${anime.title}">
+    <div class="meta">
+      <div class="title">${anime.title}</div>
+      <div class="genre-badge ${badgeClass}">${badgeLabel}</div>
+      <div class="sub">${anime.episodes.length} episodes</div>
+    </div>
+  `;
+  
+  c.addEventListener('click', ()=> openPlayer(anime.id));
+  return c;
+}
+
+
+function renderLists(){
+  populerList.innerHTML=''; recommendWrap.innerHTML='';
+  const populars = ANIME_DB.slice(0,12);
+  populars.forEach(a => populerList.appendChild(createCard(a)));
+  const recs = ANIME_DB.slice(4,18);
+  recs.forEach(a=>{
+  const rc = document.createElement('div'); 
+  rc.className='recommend-card'; 
+  rc.dataset.genre = a.genre; 
+  rc.dataset.title = a.title.toLowerCase();
+  
+  const badgeClass = (GENRE_MAP[a.genre]||{}).cls || ''; 
+  const badgeLabel = (GENRE_MAP[a.genre]?.label) || a.genre;
+  
+  rc.innerHTML = `
+    <img src="${a.img}" alt="${a.title}">
+    <div class="info">
+      <h3>${a.title}</h3>
+      <div class="genre-badge ${badgeClass}">${badgeLabel}</div>
+      <p>${a.episodes.length} episodes</p>
+    </div>
+  `;
+  
+  rc.addEventListener('click', ()=> openPlayer(a.id));
+  recommendWrap.appendChild(rc);
+});
+}
+
+function renderHistory(){
+  const historyWrap = document.getElementById('historyWrap');
+  historyWrap.innerHTML = '';
+  let history = JSON.parse(localStorage.getItem('watchHistory') || '[]');
+  if(history.length === 0){
+    historyWrap.innerHTML = '<p style="color:#9fbfd0; font-size:13px; padding:10px;">Belum ada riwayat tontonan.</p>';
+    return;
+  }
+  history.forEach(a=>{
+  const rc = document.createElement('div'); rc.className='recommend-card';
+  const badgeClass = (GENRE_MAP[a.genre]||{}).cls || ''; 
+  const badgeLabel = (GENRE_MAP[a.genre]?.label) || a.genre.charAt(0).toUpperCase() + a.genre.slice(1);
+  rc.innerHTML = `<div class="genre-badge ${badgeClass}" style="left:12px; top:12px">${badgeLabel}</div>
+    <img src="${a.img}" alt="${a.title}">
+    <div class="info">
+      <h3>${a.title}</h3>
+      <p>Episode terakhir: ${a.lastEpisode || '-'}</p>
+      <p>${a.episodes} episodes — ${badgeLabel}</p>
+    </div>`;
+  rc.addEventListener('click', ()=> openPlayer(a.id, a.lastEpisode));
+  historyWrap.appendChild(rc);
+});
+}
+
+renderLists();
+
+/* -------------------------
+   Search + Filter logic
+   ------------------------- */
+const searchInput = document.getElementById('searchInput');
+const searchBtn = document.getElementById('searchBtn');
+searchInput.addEventListener('input', ()=> applyFilters());
+searchBtn.addEventListener('click', ()=> applyFilters());
+
+function getActiveGenre(){
+  const active = document.querySelector('.genre-chips button.active');
+  return active ? active.dataset.genre : 'all';
+}
+
+function applyFilters(){
+  const q = searchInput.value.trim().toLowerCase();
+  const genre = getActiveGenre();
+  
+  document.querySelectorAll('[data-title]').forEach(el=>{
+    const title = el.dataset.title || '';
+    const animeGenres = el.dataset.genre ? el.dataset.genre.split(' ') : [];
+    
+    const matchSearch = q === '' || title.includes(q);
+    const matchGenre = genre === 'all' || animeGenres.includes(genre);
+    
+    if(matchSearch && matchGenre) {
+      el.style.display = '';
+    } else {
+      el.style.display = 'none';
+    }
+  });
+}
+
+
+/* -------------------------
+   Player logic: show video + episode buttons
+   ------------------------- */
+const playerArea = document.getElementById('playerArea');
+const videoPlayer = document.getElementById('videoPlayer');
+const episodeButtons = document.getElementById('episodeButtons');
+const playerSubtitle = document.getElementById('playerSubtitle');
+
+function findAnimeById(id){ return ANIME_DB.find(a=>a.id===id); }
+
+function openPlayer(animeId, episodeTitle){
+  currentAnimeId = animeId; // simpan ID anime aktif
+  const anime = findAnimeById(animeId);
+  if(!anime) return;
+
+  videoPlayer.poster = anime.img;
+  playerSubtitle.textContent = anime.title;
+  episodeButtons.innerHTML = '';
+
+  anime.episodes.forEach((ep, idx)=>{
+    const btn = document.createElement('button');
+    btn.textContent = ep.title;
+    btn.dataset.src = ep.src;
+    if(idx===0 && !episodeTitle) btn.classList.add('active');
+    if(ep.title === episodeTitle) btn.classList.add('active');
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.episode-buttons button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      playSrc(ep.src);
+
+      // update riwayat episode terakhir
+      let history = JSON.parse(localStorage.getItem('watchHistory') || '[]');
+      history = history.map(item => {
+        if(item.id === anime.id){
+          item.lastEpisode = ep.title;
+        }
+        return item;
+      });
+      localStorage.setItem('watchHistory', JSON.stringify(history));
+      renderHistory();
+    });
+    episodeButtons.appendChild(btn);
+  });
+
+  // simpan riwayat saat buka anime
+  let history = JSON.parse(localStorage.getItem('watchHistory') || '[]');
+  history = history.filter(item => item.id !== anime.id);
+  history.unshift({ 
+    id: anime.id, 
+    title: anime.title, 
+    img: anime.img, 
+    genre: anime.genre, 
+    episodes: anime.episodes.length,
+    lastEpisode: episodeTitle || anime.episodes[0].title
+  });
+  if(history.length > 10) history.pop();
+  localStorage.setItem('watchHistory', JSON.stringify(history));
+  renderHistory();
+
+  // putar episode pertama atau episode sesuai riwayat
+  const firstEpisode = episodeTitle 
+      ? anime.episodes.find(ep => ep.title === episodeTitle)?.src 
+      : anime.episodes[0].src;
+  playSrc(firstEpisode);
+
+  document.getElementById('playerArea').style.display = 'block';
+  setTimeout(()=> document.getElementById('playerArea').scrollIntoView({behavior:'smooth', block:'center'}), 60);
+}
+
+function playSrc(src){
+  if(!src) return;
+  while(videoPlayer.firstChild) videoPlayer.removeChild(videoPlayer.firstChild);
+  const s = document.createElement('source'); s.src = src; s.type = 'video/mp4';
+  videoPlayer.appendChild(s);
+  videoPlayer.load();
+  const p = videoPlayer.play();
+  if(p !== undefined) p.catch(()=>{/* autoplay may be blocked */});
+}
+
+document.getElementById('closePlayerBtn').addEventListener('click', ()=>{
+  videoPlayer.pause(); // Hentikan video
+  document.getElementById('playerArea').style.display = 'none'; // Sembunyikan pemutar
+  videoPlayer.removeAttribute('src'); // Hapus source
+  videoPlayer.load(); // Reset player
+});
+
+
+/* small: keyboard slider control */
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'ArrowRight') showSlide(slideIndex+1);
+  if(e.key === 'ArrowLeft') showSlide(slideIndex-1);
+});
+
+// Loading screen logic
+window.addEventListener('load', () => {
+  const loader = document.getElementById('loadingScreen');
+  loader.style.opacity = '0';
+  setTimeout(() => loader.style.display = 'none', 500);
+});
+
+// Elemen profil
+const profileNameEl = document.getElementById('profileName');
+const profileImageEl = document.getElementById('profileImage');
+const profileModal = document.getElementById('profileModal');
+const profileNameInput = document.getElementById('profileNameInput');
+const profileImageInput = document.getElementById('profileImageInput');
+
+// Buka modal saat klik foto
+document.getElementById('editProfileBtn').addEventListener('click', () => {
+  profileNameInput.value = localStorage.getItem('profileName') || '';
+  profileModal.style.display = 'flex';
+});
+
+// Simpan perubahan profil
+document.getElementById('saveProfileBtn').addEventListener('click', () => {
+  const name = profileNameInput.value.trim();
+  if (name) {
+    localStorage.setItem('profileName', name);
+    profileNameEl.textContent = name;
+  }
+  if (profileImageInput.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      localStorage.setItem('profileImage', e.target.result);
+      profileImageEl.src = e.target.result;
+    }
+    reader.readAsDataURL(profileImageInput.files[0]);
+  }
+  profileModal.style.display = 'none';
+});
+
+// Tutup modal
+document.getElementById('closeProfileModal').addEventListener('click', () => {
+  profileModal.style.display = 'none';
+});
+
+// Load profil saat halaman dibuka
+window.addEventListener('DOMContentLoaded', () => {
+  const savedName = localStorage.getItem('profileName');
+  const savedImage = localStorage.getItem('profileImage');
+  if (savedName) profileNameEl.textContent = savedName;
+  if (savedImage) profileImageEl.src = savedImage;
+});
+
+
+
+</script>
+</body>
+</html>
